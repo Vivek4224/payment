@@ -1,0 +1,252 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  background-image: url('path-to-background-pattern.png'); /* Replace with your pattern image */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  position: relative;
+  background: #f5f5f5;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 80%;
+  max-width: 800px;
+  animation: fadeIn 1s ease-in;
+}
+
+h1 {
+  color: #2ecc71;
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.plan-selection, .payment-method {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+}
+
+select:hover {
+  transform: scale(1.02);
+}
+
+.amount {
+  font-size: 1.2rem;
+  color: #333;
+  margin-top: 10px;
+}
+
+.payment-options {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.payment-btn {
+  padding: 10px 20px;
+  border: none;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.payment-btn:hover {
+  background: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.payment-btn.active {
+  background: #2ecc71;
+  color: white;
+}
+
+.payment-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  display: block;
+}
+
+.payment-form.hidden {
+  display: none;
+}
+
+h2 {
+  color: #2ecc71;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s, transform 0.3s;
+}
+
+input:focus {
+  border-color: #2ecc71;
+  transform: scale(1.02);
+  outline: none;
+}
+
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+.submit-btn {
+  background: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  background: #27ae60;
+  transform: scale(1.05);
+}
+
+label {
+  margin-top: 10px;
+  color: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin: 5px 0;
+  color: #333;
+}
+
+li input[type="radio"] {
+  margin-right: 10px;
+}
+
+.sidebar {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  background: #333;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.sidebar button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 8px;
+  transition: background 0.3s;
+}
+
+.sidebar button:hover {
+  background: #555;
+}
+
+.success-message {
+  margin-top: 20px;
+  color: #2ecc71;
+  font-size: 1.5rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.success-message.show {
+  opacity: 1;
+}
+
+.check-mark {
+  font-size: 2.5rem;
+  margin-right: 1rem;
+  animation: bounce 0.5s ease;
+}
+
+.download-btn {
+  background: #2ecc71;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.download-btn:hover {
+  background: #27ae60;
+  transform: scale(1.05);
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+      transform: translateY(0);
+  }
+  40% {
+      transform: translateY(-15px);
+  }
+  60% {
+      transform: translateY(-8px);
+  }
+}
