@@ -1,11 +1,12 @@
 let selectedAmount = 0;
 let customerName = '';
+let selectedMethod = '';
 
 function updateAmount() {
     const planSelect = document.getElementById('planSelect');
     const amountSpan = document.getElementById('amount');
     const cashAmount = document.getElementById('cashAmount');
-    selectedAmount = planSelect.value;
+    selectedAmount = parseInt(planSelect.value) || 0;
     amountSpan.textContent = selectedAmount;
     cashAmount.textContent = selectedAmount;
 }
@@ -15,6 +16,7 @@ function showCreditCard() {
     document.getElementById('credit-card-form').classList.remove('hidden');
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('button[onclick="showCreditCard"]').classList.add('active');
+    selectedMethod = 'Credit Card';
 }
 
 function showDebitCard() {
@@ -22,6 +24,7 @@ function showDebitCard() {
     document.getElementById('debit-card-form').classList.remove('hidden');
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('button[onclick="showDebitCard"]').classList.add('active');
+    selectedMethod = 'Debit Card';
 }
 
 function showNetBanking() {
@@ -29,6 +32,7 @@ function showNetBanking() {
     document.getElementById('net-banking-form').classList.remove('hidden');
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('button[onclick="showNetBanking"]').classList.add('active');
+    selectedMethod = 'Net Banking';
 }
 
 function showUPI() {
@@ -36,13 +40,20 @@ function showUPI() {
     document.getElementById('upi-form').classList.remove('hidden');
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector('button[onclick="showUPI"]').classList.add('active');
+    selectedMethod = 'UPI';
 }
 
 function showCash() {
     hideAllForms();
-    document.getElementById('cash-form').classList.remove('hidden');
-    document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('button[onclick="showCash"]').classList.add('active');
+    const cashForm = document.getElementById('cash-form');
+    if (cashForm) {
+        cashForm.classList.remove('hidden');
+        document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('button[onclick="showCash"]').classList.add('active');
+        selectedMethod = 'Cash';
+    } else {
+        console.error("Error: 'cash-form' element not found.");
+    }
 }
 
 function hideAllForms() {
@@ -80,30 +91,28 @@ function confirmPayment(method) {
     }
 
     customerName = nameInput;
-    successAmount.textContent = selectedAmount;
+    selectedAmount = planSelect.value;  // ✅ Ensure the selected amount is stored
+    selectedPlanText = planSelect.options[planSelect.selectedIndex].text;  // ✅ Store selected plan text
+    selectedMethod = method;
+
+    successAmount.textContent = "₹" + selectedAmount;
     successCustomerName.textContent = customerName;
+
     successMessage.classList.remove('hidden');
     successMessage.classList.add('show');
-    
-    // Hide the success message after 5 seconds
+
     setTimeout(() => {
         successMessage.classList.remove('show');
         successMessage.classList.add('hidden');
     }, 5000);
 
-    // Reset the selection and forms
-    planSelect.value = "0";
-    updateAmount();
     hideAllForms();
-    document.getElementById('creditForm').reset();
-    document.getElementById('debitForm').reset();
-    document.getElementById('netBankingForm').reset();
-    document.getElementById('upiForm').reset();
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
 
-    // Generate and download PDF receipt
-    generatePDF();
+    downloadReceipt();  // ✅ Call downloadReceipt() after amount is stored properly
 }
+
+
 
 function confirmCashPayment() {
     const planSelect = document.getElementById('planSelect');
@@ -116,26 +125,28 @@ function confirmCashPayment() {
         return;
     }
 
-    successAmount.textContent = selectedAmount;
-    successCustomerName.textContent = "Guest"; // Default for cash (no name input)
+    customerName = "Guest";
+    selectedAmount = planSelect.value;  // <-- FIX: Store selected amount for cash payment
+    selectedMethod = "Cash";
+
+    successAmount.textContent = "₹" + selectedAmount;
+    successCustomerName.textContent = customerName;
     successMessage.classList.remove('hidden');
     successMessage.classList.add('show');
-    
-    // Hide the success message after 5 seconds
+
     setTimeout(() => {
         successMessage.classList.remove('show');
         successMessage.classList.add('hidden');
     }, 5000);
 
-    // Reset the selection
     planSelect.value = "0";
     updateAmount();
     hideAllForms();
     document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('active'));
 
-    // Generate and download PDF receipt
-    generatePDF();
+    downloadReceipt();
 }
+
 
 function goBack() {
     hideAllForms();
@@ -144,71 +155,63 @@ function goBack() {
 }
 
 function downloadReceipt() {
-    if (window.jspdf) { // Ensure jsPDF is loaded
+    if (window.jspdf) {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const doc = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: [150, 200] // Custom receipt size
+        });
 
-        // Define colors
-        const primaryColor = [0, 102, 204]; // Blue
-        const secondaryColor = [255, 69, 0]; // Red (for dividers)
-        const textColor = [50, 50, 50]; // Dark gray text
+        // Set solid background color (Blue-Purple)
+        doc.setFillColor(30, 58, 138); // Dark Blue color
+        doc.rect(0, 0, 150, 200, "F"); // Fill entire background
 
-        // Set title style
+        // Set font and text color (white)
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]); // Blue title
-        doc.setFontSize(18);
-        doc.text("Gym Membership Payment Receipt", 105, 20, { align: "center" });
+        doc.setFontSize(20);
+        doc.setTextColor(255, 255, 255);
+        doc.text("MuscleMatrix Gym", 75, 20, { align: "center" });
 
-        // Draw a red line under title
-        doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-        doc.setLineWidth(1);
-        doc.line(20, 25, 190, 25);
-
-        // Set font for details
-        doc.setFontSize(12);
         doc.setFont("helvetica", "normal");
-        doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-
-        // Ensure selected values are correct
-        const selectedPlan = document.getElementById('planSelect');
-        const selectedPlanText = selectedPlan.selectedOptions.length > 0 ? selectedPlan.selectedOptions[0].text : "Not Selected";
-        const paymentMethod = getSelectedMethod() || "Not Specified";
-
-        // Payment details
-        let yPosition = 40;
-        doc.text(`🧑 Customer Name: ${customerName || 'Guest'}`, 20, yPosition);
-        yPosition += 10;
-        doc.text(`📜 Selected Plan: ${selectedPlanText}`, 20, yPosition);
-        yPosition += 10;
-        doc.text(`💰 Amount Paid: ₹${selectedAmount}`, 20, yPosition);
-        yPosition += 10;
-        doc.text(`💳 Payment Method: ${paymentMethod}`, 20, yPosition);
-        yPosition += 10;
-        doc.text(`📅 Date & Time: ${new Date().toLocaleString()}`, 20, yPosition);
-
-        // Add another red separator line
-        yPosition += 10;
-        doc.setDrawColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-        doc.line(20, yPosition, 190, yPosition);
-        yPosition += 10;
-
-        // Add a thank-you message
         doc.setFontSize(14);
-        doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-        doc.text("🎉 Thank you for choosing our gym! Stay fit & healthy!", 105, yPosition, { align: "center" });
+        doc.text("Membership Payment Receipt", 75, 30, { align: "center" });
+
+        // White separator line
+        doc.setDrawColor(255, 255, 255);
+        doc.line(20, 35, 130, 35);
+
+        // Add Receipt Details
+        doc.setFontSize(12);
+        let yPosition = 50;
+        doc.text("Customer Name: " + customerName, 20, yPosition);
+        yPosition += 10;
+        doc.text("Selected Plan: " + selectedPlanText, 20, yPosition);
+        yPosition += 10;
+        doc.text("Amount Paid: ₹" + selectedAmount, 20, yPosition);
+        yPosition += 10;
+        doc.text("Payment Method: " + selectedMethod, 20, yPosition);
+        yPosition += 10;
+        doc.text("Date & Time: " + new Date().toLocaleString(), 20, yPosition);
+        yPosition += 10;
+
+        // Another separator
+        doc.line(20, yPosition, 130, yPosition);
+        yPosition += 10;
+
+        // Thank you message
+        doc.setFontSize(14);
+        doc.setTextColor(255, 215, 0); // Gold Yellow for highlight
+        doc.text("Thank you for choosing MuscleMatrix Gym!", 75, yPosition, { align: "center" });
 
         // Save the PDF
-        doc.save(`Gym_Payment_Receipt_${customerName || 'Guest'}_${new Date().toISOString().split('T')[0]}.pdf`);
+        doc.save(`Payment_Receipt_${customerName}.pdf`);
     } else {
         console.error("jsPDF library is not loaded.");
         alert("PDF library is missing. Please ensure the jsPDF script is included in your HTML.");
     }
 }
 
-
-
-
 function getSelectedMethod() {
-    const activeBtn = document.querySelector('.payment-btn.active');
-    return activeBtn ? activeBtn.textContent : 'Unknown Method';
+    return selectedMethod || "Unknown Method";
 }
